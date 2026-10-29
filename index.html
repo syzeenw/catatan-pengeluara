@@ -8,7 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Tesseract.js untuk Scan Struk via Kamera -->
+    <!-- Tesseract.js untuk Scan Struk via Kamera/Galeri -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Tesseract.js/4.0.2/tesseract.min.js"></script>
     <style>
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #f8fafc; color: #1e293b; }
@@ -26,10 +26,10 @@
                 <h1 class="text-xl font-bold">Catatan Pengeluaran</h1>
             </div>
             <div class="flex gap-2">
-                <button onclick="openCameraModal()" class="bg-white/20 hover:bg-white/30 p-2.5 rounded-full text-white backdrop-blur-md transition active:scale-95 shadow-inner" title="Scan Struk Kamera">
+                <button onclick="openCameraModal()" class="bg-white/20 hover:bg-white/30 p-2.5 rounded-full text-white backdrop-blur-md transition active:scale-95 shadow-inner" title="Scan Struk Kamera / Galeri">
                     <i class="fa-solid fa-camera text-lg"></i>
                 </button>
-                <button onclick="resetData()" class="bg-white/20 hover:bg-white/30 p-2.5 rounded-full text-white backdrop-blur-md transition active:scale-95">
+                <button onclick="resetData()" class="bg-white/20 hover:bg-white/30 p-2.5 rounded-full text-white backdrop-blur-md transition active:scale-95" title="Reset Data">
                     <i class="fa-solid fa-rotate-right text-lg"></i>
                 </button>
             </div>
@@ -61,7 +61,7 @@
     <!-- Main Content Area -->
     <main class="flex-1 p-4 overflow-y-auto space-y-5">
         
-        <!-- Tab Navigation Content -->
+        <!-- Tab Beranda -->
         <div id="tab-home" class="space-y-4">
             <div class="flex justify-between items-center">
                 <h3 class="font-bold text-slate-800 text-base">Riwayat Transaksi</h3>
@@ -125,7 +125,7 @@
                     <input type="text" id="desc" required placeholder="Contoh: Makan siang / Gaji bulanan" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
                 </div>
 
-                <!-- Kategori & Bentuk Uang (Metode Pembayaran) -->
+                <!-- Kategori & Bentuk Uang -->
                 <div class="grid grid-cols-2 gap-3">
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 mb-1">Kategori</label>
@@ -164,24 +164,25 @@
     <div id="cameraModal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-md z-50 hidden flex flex-col items-center justify-center p-4">
         <div class="bg-white w-full max-w-md rounded-2xl p-6 shadow-2xl space-y-4 text-center">
             <div class="flex justify-between items-center border-b pb-3">
-                <h3 class="font-bold text-lg text-slate-800">Scan Struk / Nota via Kamera</h3>
+                <h3 class="font-bold text-lg text-slate-800">Scan Struk / Nota</h3>
                 <button onclick="closeCameraModal()" class="text-slate-400 hover:text-slate-600 text-lg p-1"><i class="fa-solid fa-xmark"></i></button>
             </div>
             
-            <p class="text-xs text-slate-500">Ambil foto struk belanja atau nota pembayaran Anda. Sistem akan otomatis mendeteksi nominal angka di dalamnya.</p>
+            <p class="text-xs text-slate-500">Ambil foto baru dengan kamera atau pilih foto struk dari galeri HP Anda.</p>
 
-            <div id="scannerPreviewArea" class="border-2 border-dashed border-slate-300 rounded-2xl p-6 flex flex-col items-center justify-center bg-slate-50 relative min-h-[180px]">
+            <!-- Input File Universal (Tanpa capture agar galeri & kamera bisa dipilih) -->
+            <div class="border-2 border-dashed border-slate-300 rounded-2xl p-6 flex flex-col items-center justify-center bg-slate-50 relative min-h-[160px]">
                 <i class="fa-solid fa-receipt text-4xl text-slate-400 mb-2"></i>
-                <p class="text-xs text-slate-600 font-medium">Pilih atau foto struk Anda</p>
-                <input type="file" id="receiptInput" accept="image/*" capture="environment" onchange="processReceipt(event)" class="absolute inset-0 opacity-0 cursor-pointer">
+                <p class="text-xs text-slate-600 font-medium mb-1">Ketuk tombol di bawah untuk memilih foto</p>
+                <input type="file" id="receiptInput" accept="image/*" onchange="processReceipt(event)" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full">
             </div>
 
             <div id="scanStatus" class="hidden text-xs font-semibold text-blue-600 flex items-center justify-center gap-2">
                 <i class="fa-solid fa-spinner animate-spin"></i> Membaca struk dengan AI... Mohon tunggu sebentar.
             </div>
 
-            <button onclick="document.getElementById('receiptInput').click()" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-3 rounded-xl transition text-sm">
-                <i class="fa-solid fa-camera mr-2"></i> Buka Kamera / Pilih Foto
+            <button onclick="document.getElementById('receiptInput').click()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 rounded-xl transition text-sm shadow-md shadow-blue-500/20">
+                <i class="fa-solid fa-images mr-2"></i> Buka Kamera / Pilih dari Galeri
             </button>
         </div>
     </div>
@@ -285,6 +286,13 @@
             }
         }
 
+        function resetData() {
+            if (confirm('Reset seluruh data transaksi? Tindakan ini tidak dapat dibatalkan.')) {
+                transactions = [];
+                saveAndRender();
+            }
+        }
+
         function saveAndRender() {
             localStorage.setItem('catatan_pengeluaran_tx', JSON.stringify(transactions));
             renderApp();
@@ -350,7 +358,7 @@
 
             const monthlyData = {};
             transactions.forEach(t => {
-                const monthYear = t.date.substring(0, 7); // Format: YYYY-MM
+                const monthYear = t.date.substring(0, 7);
                 if (!monthlyData[monthYear]) {
                     monthlyData[monthYear] = { income: 0, expense: 0, categories: {}, methods: {} };
                 }
@@ -412,7 +420,7 @@
             });
         }
 
-        // Fungsi Scan Struk Otomatis Menggunakan Tesseract.js (OCR)
+        // Fungsi Scan Struk via Tesseract.js (OCR)
         async function processReceipt(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -427,15 +435,13 @@
                 const text = result.data.text;
                 console.log("OCR Result:", text);
 
-                // Cari angka terbesar atau format uang pada teks struk
                 const numbers = text.match(/\b\d{1,3}([.,]\d{3})*([.,]\d+)?\b/g);
-                let detectedAmount = 50000; // Default fallback
+                let detectedAmount = 50000;
 
                 if (numbers && numbers.length > 0) {
-                    // Bersihkan dan ubah ke angka
                     const cleanedNumbers = numbers.map(n => parseInt(n.replace(/[.,]/g, ''))).filter(n => n > 1000 && n < 100000000);
                     if (cleanedNumbers.length > 0) {
-                        detectedAmount = Math.max(...cleanedNumbers); // Ambil nilai terbesar (biasanya total harga)
+                        detectedAmount = Math.max(...cleanedNumbers);
                     }
                 }
 
